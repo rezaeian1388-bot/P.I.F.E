@@ -314,31 +314,81 @@
 </div>
 
 <script>
-// آدرس پایه فایل‌ها روی GitHub (repo: rezaeian1388-bot/P.I.F.E)
-// اگر اسم ریپازیتوری یا یوزرنیم فرق کرد، همین خط رو عوض کنید
-const BASE_URL = "https://raw.githubusercontent.com/rezaeian1388-bot/P.I.F.E/main";
+// آدرس ریپازیتوری GitHub شما
+const GH_USER = "rezaeian1388-bot";
+const GH_REPO = "P.I.F.E";
+const BASE_URL = `https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main`;
+const API_URL = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/songs`;
 
-// همه ۱۷ خواننده. فیلد songs را با آهنگ‌های واقعی هر خواننده پر کنید:
-// { title: "اسم فارسی آهنگ", file: "songs/<pooshe>/<file>.m4a" }
+// همه ۱۷ خواننده. "slug" = اسم پوشه‌ای که باید توی songs/ بسازید (لاتین، ساده)
 const singers = [
-  { id: 1,  name: "گوگوش",          photo: "1.jpg",  songs: [] },
-  { id: 2,  name: "هایده",          photo: "2.jpg",  songs: [] },
-  { id: 3,  name: "مهستی",          photo: "3.jpg",  songs: [] },
-  { id: 4,  name: "حمیرا",          photo: "4.jpg",  songs: [] },
-  { id: 5,  name: "ویگن",           photo: "5.jpg",  songs: [] },
-  { id: 6,  name: "داریوش",         photo: "6.jpg",  songs: [] },
-  { id: 7,  name: "ابی",            photo: "7.jpg",  songs: [] },
-  { id: 8,  name: "عارف",           photo: "8.jpg",  songs: [] },
-  { id: 9,  name: "سیاوش قمیشی",    photo: "9.jpg",  songs: [] },
-  { id: 10, name: "ستار",           photo: "10.jpg", songs: [] },
-  { id: 11, name: "شاهرخ",          photo: "11.jpg", songs: [] },
-  { id: 12, name: "حسن شماعی‌زاده", photo: "12.jpg", songs: [] },
-  { id: 13, name: "معین",           photo: "13.jpg", songs: [] },
-  { id: 14, name: "حبیب",           photo: "14.jpg", songs: [] },
-  { id: 15, name: "لیلا فروهر",     photo: "15.jpg", songs: [] },
-  { id: 16, name: "ایرج",           photo: "16.jpg", songs: [] },
-  { id: 17, name: "فتانه",          photo: "17.jpg", songs: [] }
+  { id: 1,  name: "گوگوش",          slug: "googoosh",              photo: "1.jpg",  songs: [] },
+  { id: 2,  name: "هایده",          slug: "hayedeh",               photo: "2.jpg",  songs: [] },
+  { id: 3,  name: "مهستی",          slug: "mahasti",               photo: "3.jpg",  songs: [] },
+  { id: 4,  name: "حمیرا",          slug: "homeira",               photo: "4.jpg",  songs: [] },
+  { id: 5,  name: "ویگن",           slug: "vigen",                 photo: "5.jpg",  songs: [] },
+  { id: 6,  name: "داریوش",         slug: "dariush",               photo: "6.jpg",  songs: [] },
+  { id: 7,  name: "ابی",            slug: "ebi",                   photo: "7.jpg",  songs: [] },
+  { id: 8,  name: "عارف",           slug: "aref",                  photo: "8.jpg",  songs: [] },
+  { id: 9,  name: "سیاوش قمیشی",    slug: "siavash-ghomayshi",     photo: "9.jpg",  songs: [] },
+  { id: 10, name: "ستار",           slug: "sattar",                photo: "10.jpg", songs: [] },
+  { id: 11, name: "شاهرخ",          slug: "shahrokh",              photo: "11.jpg", songs: [] },
+  { id: 12, name: "حسن شماعی‌زاده", slug: "hassan-shamaeezadeh",   photo: "12.jpg", songs: [] },
+  { id: 13, name: "معین",           slug: "moein",                 photo: "13.jpg", songs: [] },
+  { id: 14, name: "حبیب",           slug: "habib",                 photo: "14.jpg", songs: [] },
+  { id: 15, name: "لیلا فروهر",     slug: "leila-forouhar",        photo: "15.jpg", songs: [] },
+  { id: 16, name: "ایرج",           slug: "iraj",                  photo: "16.jpg", songs: [] },
+  { id: 17, name: "فتانه",          slug: "fataneh",               photo: "17.jpg", songs: [] }
 ];
+
+// تبدیل تقریبی فینگیلیش به فارسی (بهترین حدس، نه ترجمه دقیق)
+function finglishToPersian(text) {
+  let s = text.toLowerCase();
+  const map = [
+    ['kh','خ'],['gh','ق'],['sh','ش'],['ch','چ'],['zh','ژ'],['th','ث'],['ph','ف'],
+    ['aa','آ'],['ee','ی'],['oo','و'],['ou','و'],['ei','ی'],
+    ['a','ا'],['b','ب'],['c','ک'],['d','د'],['e','ه'],['f','ف'],
+    ['g','گ'],['h','ه'],['i','ی'],['j','ج'],['k','ک'],['l','ل'],
+    ['m','م'],['n','ن'],['o','و'],['p','پ'],['q','ق'],['r','ر'],
+    ['s','س'],['t','ت'],['u','و'],['v','و'],['w','و'],['y','ی'],['z','ز']
+  ];
+  let out = '', i = 0;
+  while (i < s.length) {
+    if (s[i] === ' ') { out += ' '; i++; continue; }
+    let matched = false;
+    for (const [lat, per] of map) {
+      if (s.startsWith(lat, i)) { out += per; i += lat.length; matched = true; break; }
+    }
+    if (!matched) i++;
+  }
+  return out;
+}
+
+// پاکسازی اسم فایل: حذف پسوند، پرانتز، عدد کیفیت، خط تیره/زیرخط، اسم خواننده
+function cleanTitle(filename, singerSlug) {
+  let name = filename.replace(/\.[a-zA-Z0-9]+$/, '');
+  name = name.replace(/\(.*?\)/g, ' ');
+  name = name.replace(/[_-]/g, ' ');
+  name = name.replace(/\b\d{2,4}\b/g, ' ');
+  const singerRegex = new RegExp(singerSlug.replace(/-/g, '.?'), 'gi');
+  name = name.replace(singerRegex, ' ');
+  name = name.trim().replace(/\s+/g, ' ');
+  return finglishToPersian(name) || name;
+}
+
+// خواندن لیست فایل‌های آهنگ هر خواننده مستقیم از GitHub
+async function fetchSongs(singer) {
+  try {
+    const res = await fetch(`${API_URL}/${singer.slug}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data
+      .filter(f => f.type === 'file')
+      .map(f => ({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
+  } catch (e) {
+    return [];
+  }
+}
 
 const grid = document.getElementById('grid');
 const songsView = document.getElementById('songsView');
@@ -372,7 +422,7 @@ searchInput.addEventListener('input', () => {
   renderGrid(filtered);
 });
 
-function openSinger(id) {
+async function openSinger(id) {
   const s = singers.find(x => x.id === id);
   document.querySelector('.search-wrap').style.display = 'none';
   document.querySelector('.label-pill').style.display = 'none';
@@ -381,15 +431,20 @@ function openSinger(id) {
 
   document.getElementById('songsPhoto').style = photoStyle(s.photo);
   document.getElementById('songsName').textContent = s.name;
-  document.getElementById('songsCount').textContent = s.songs.length + ' آهنگ';
+  document.getElementById('songsCount').textContent = '...';
 
   const list = document.getElementById('songsList');
-  if (s.songs.length === 0) {
-    list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} اضافه نشده.</div>`;
+  list.innerHTML = `<div class="empty-note">در حال دریافت آهنگ‌ها...</div>`;
+
+  const songs = await fetchSongs(s);
+  document.getElementById('songsCount').textContent = songs.length + ' آهنگ';
+
+  if (songs.length === 0) {
+    list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} آپلود نشده (پوشه songs/${s.slug}/ رو چک کنید).</div>`;
     return;
   }
   list.innerHTML = '';
-  s.songs.forEach((song, i) => {
+  songs.forEach((song, i) => {
     const row = document.createElement('div');
     row.className = 'song-row';
     row.onclick = () => playSong(song, s.name);
