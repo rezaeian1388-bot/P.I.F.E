@@ -6,16 +6,18 @@
 <title>P.I.F.E SONG</title>
 <style>
   :root {
-    --blue-deep: #0d3b66;
-    --blue: #1c66b3;
+    --blue-deep: #071a30;
+    --blue: #12345c;
     --blue-bright: #2f8fe0;
-    --blue-light: #eaf3fc;
-    --bg: #f4f8fd;
-    --card: #ffffff;
-    --border: #dbe7f5;
-    --text: #16233a;
-    --muted: #6b7d94;
-    --gold: #d8b25c;
+    --blue-light: #142442;
+    --accent-text: #7fc2ff;
+    --bg: #060b16;
+    --card: #0e1728;
+    --card2: #101b30;
+    --border: #1d2c48;
+    --text: #eaf1fb;
+    --muted: #8496b3;
+    --gold: #e0b563;
   }
   * { box-sizing: border-box; }
   body {
@@ -104,12 +106,14 @@
     width: 100%;
     padding: 14px 18px;
     border-radius: 16px;
-    border: none;
+    border: 1px solid var(--border);
     font-size: 15px;
     text-align: right;
-    background: #fff;
-    box-shadow: 0 8px 24px rgba(13,59,102,.15);
+    background: var(--card2);
+    color: var(--text);
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
   }
+  #search::placeholder { color: var(--muted); }
   #search:focus { outline: 2px solid var(--blue-bright); }
 
   .label-pill {
@@ -144,7 +148,8 @@
   }
   .singer-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 22px rgba(13,59,102,.12);
+    box-shadow: 0 10px 26px rgba(47,143,224,.25);
+    border-color: var(--blue-bright);
   }
   .singer-photo {
     width: 80px;
@@ -172,7 +177,7 @@
     display: inline-block;
     margin-top: 7px;
     font-size: 11px;
-    color: var(--blue);
+    color: var(--accent-text);
     background: var(--blue-light);
     padding: 3px 11px;
     border-radius: 10px;
@@ -187,7 +192,7 @@
   .back-btn {
     background: var(--blue-light);
     border: none;
-    color: var(--blue);
+    color: var(--accent-text);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -200,9 +205,10 @@
     align-items: center;
     gap: 14px;
     margin-bottom: 20px;
-    background: linear-gradient(135deg, var(--blue-light), #fff);
+    background: linear-gradient(135deg, var(--blue-light), var(--card2));
     padding: 16px;
     border-radius: 16px;
+    border: 1px solid var(--border);
   }
   .songs-header .singer-photo { margin: 0; width: 62px; height: 62px; }
   .song-row {
@@ -217,12 +223,12 @@
     cursor: pointer;
     transition: box-shadow .15s ease;
   }
-  .song-row:hover { box-shadow: 0 4px 14px rgba(13,59,102,.10); }
+  .song-row:hover { box-shadow: 0 4px 16px rgba(47,143,224,.18); border-color: var(--blue-bright); }
   .song-row .num {
     width: 28px; height: 28px;
     border-radius: 50%;
     background: var(--blue-light);
-    color: var(--blue);
+    color: var(--accent-text);
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; flex-shrink: 0;
   }
@@ -283,7 +289,7 @@
   .fav-btn.active { color: #ff4d6d; }
   .song-row .fav-btn {
     background: transparent !important;
-    color: var(--border);
+    color: var(--muted);
     font-size: 17px;
     border: none;
     cursor: pointer;
@@ -296,7 +302,7 @@
     content: "";
     display: inline-block;
     width: 12px; height: 12px;
-    border: 2px solid var(--blue);
+    border: 2px solid var(--blue-bright);
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin .7s linear infinite;
@@ -560,13 +566,23 @@ function renderGrid(list) {
     const card = document.createElement('div');
     card.className = 'singer-card';
     card.onclick = () => openSinger(s.id);
+    const countLabel = s.loaded ? `${s.songs.length} آهنگ` : '...';
     card.innerHTML = `
       <div class="singer-photo" style="${photoStyle(s.photo)}"></div>
       <div class="singer-name">${s.name}</div>
-      <div class="singer-count">${s.songs.length} آهنگ</div>
+      <div class="singer-count">${countLabel}</div>
     `;
     grid.appendChild(card);
   });
+}
+
+// از ابتدا تعداد آهنگ‌های همه خواننده‌ها رو موازی می‌گیریم تا کارت‌ها عدد درست نشون بدن
+async function preloadAllCounts() {
+  await Promise.all(singers.map(async s => {
+    s.songs = await fetchSongs(s);
+    s.loaded = true;
+  }));
+  renderGrid(singers);
 }
 
 searchInput.addEventListener('input', () => {
@@ -587,13 +603,20 @@ async function openSinger(id) {
 
   document.getElementById('songsPhoto').style = photoStyle(s.photo);
   document.getElementById('songsName').textContent = s.name;
-  document.getElementById('songsCount').textContent = '...';
 
   const list = document.getElementById('songsList');
-  list.innerHTML = `<div class="empty-note">در حال دریافت آهنگ‌ها...</div>`;
-
-  const songs = await fetchSongs(s);
-  document.getElementById('songsCount').textContent = songs.length + ' آهنگ';
+  let songs;
+  if (s.loaded) {
+    songs = s.songs;
+    document.getElementById('songsCount').textContent = songs.length + ' آهنگ';
+  } else {
+    document.getElementById('songsCount').textContent = '...';
+    list.innerHTML = `<div class="empty-note">در حال دریافت آهنگ‌ها...</div>`;
+    songs = await fetchSongs(s);
+    s.songs = songs;
+    s.loaded = true;
+    document.getElementById('songsCount').textContent = songs.length + ' آهنگ';
+  }
 
   if (songs.length === 0) {
     list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} آپلود نشده (پوشه songs/${s.slug}/ رو چک کنید).</div>`;
@@ -750,7 +773,7 @@ function playSong(list, index, singerName, singerPhoto) {
   const song = list[index];
   if (!song) return;
 
-  audio.src = `${BASE_URL}/${song.file}`;
+  audio.src = song.file;
   audio.play().catch(() => {});
   player.classList.add('active');
   player.classList.remove('paused');
@@ -837,6 +860,7 @@ function closeNowPlaying() {
 }
 
 renderGrid(singers);
+preloadAllCounts();
 </script>
 
 </body>
