@@ -6,504 +6,325 @@
 <title>P.I.F.E SONG</title>
 <style>
   :root {
-    --blue-deep: #071a30;
-    --blue: #12345c;
-    --blue-bright: #2f8fe0;
-    --blue-light: #142442;
-    --accent-text: #7fc2ff;
-    --bg: #060b16;
-    --card: #0e1728;
-    --card2: #101b30;
-    --border: #1d2c48;
-    --text: #eaf1fb;
-    --muted: #8496b3;
-    --gold: #e0b563;
+    --navy-deep: #050b18;
+    --navy: #0b1526;
+    --navy-light: #121f38;
+    --panel: #0e192e;
+    --border: #1c2c48;
+    --blue: #2f8fe0;
+    --blue-glow: #4fb3ff;
+    --text: #eef3fb;
+    --muted: #7c8bab;
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
+  html, body {
+    margin: 0; height: 100%;
     font-family: Tahoma, Vazirmatn, sans-serif;
-    background: var(--bg);
+    background: var(--navy-deep);
     color: var(--text);
   }
-
-  /* هدر گرادیانت با موج تزئینی */
-  header {
-    background: linear-gradient(135deg, var(--blue-deep), var(--blue) 60%, var(--blue-bright));
-    padding: 34px 16px 46px;
-    text-align: center;
-    position: relative;
+  #app {
+    display: grid;
+    grid-template-columns: 230px 1fr 300px;
+    height: 100vh;
     overflow: hidden;
-    border-radius: 0 0 28px 28px;
   }
-  header::before {
-    content: "♪ ♫ ♪";
-    position: absolute;
-    top: 12px; left: 20px;
-    color: rgba(255,255,255,.12);
-    font-size: 26px;
-    letter-spacing: 8px;
-  }
-  header::after {
-    content: "♫ ♪ ♫";
-    position: absolute;
-    bottom: 10px; right: 20px;
-    color: rgba(255,255,255,.10);
-    font-size: 22px;
-    letter-spacing: 8px;
-  }
-  .logo {
-    font-size: 40px;
-    font-style: italic;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 1.5px;
-    text-shadow: 0 2px 10px rgba(0,0,0,.25);
-  }
-  .tagline {
-    color: rgba(255,255,255,.75);
-    font-size: 12px;
-    margin-top: 4px;
-    letter-spacing: 2px;
+  @media (max-width: 900px) {
+    #app { grid-template-columns: 0 1fr 0; }
+    #sidebar, #queuePanel { display: none; }
   }
 
-  /* موج صوتی تزئینی */
-  .wave {
+  #sidebar {
+    background: var(--navy);
+    border-left: 1px solid var(--border);
+    padding: 18px 14px;
     display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 4px;
-    height: 30px;
-    margin-top: 18px;
+    flex-direction: column;
+    overflow-y: auto;
   }
-  .wave span {
-    width: 4px;
-    border-radius: 3px;
-    background: rgba(255,255,255,.55);
-    animation: bounce 1.4s ease-in-out infinite;
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+    padding: 0 4px;
   }
-  .wave span:nth-child(1){height:35%;animation-delay:0s;}
-  .wave span:nth-child(2){height:70%;animation-delay:.1s;}
-  .wave span:nth-child(3){height:100%;animation-delay:.2s;}
-  .wave span:nth-child(4){height:55%;animation-delay:.3s;}
-  .wave span:nth-child(5){height:85%;animation-delay:.4s;}
-  .wave span:nth-child(6){height:40%;animation-delay:.5s;}
-  .wave span:nth-child(7){height:65%;animation-delay:.6s;}
-  .wave span:nth-child(8){height:25%;animation-delay:.7s;}
-  @keyframes bounce {
-    0%, 100% { transform: scaleY(.5); opacity:.6; }
-    50% { transform: scaleY(1); opacity:1; }
+  .logo-mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: radial-gradient(circle at 30% 30%, var(--blue-glow), var(--blue) 70%);
+    box-shadow: 0 0 14px rgba(79,179,255,.5);
   }
+  .logo-text { font-weight: 700; font-size: 16px; letter-spacing: .5px; }
 
-  .search-wrap {
-    max-width: 480px;
-    margin: -24px auto 0;
-    padding: 0 16px;
-    position: relative;
-    z-index: 2;
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    color: var(--muted); font-size: 13.5px; cursor: pointer;
+    margin-bottom: 2px;
   }
-  #search {
-    width: 100%;
-    padding: 14px 18px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    font-size: 15px;
-    text-align: right;
-    background: var(--card2);
-    color: var(--text);
-    box-shadow: 0 8px 24px rgba(0,0,0,.35);
-  }
-  #search::placeholder { color: var(--muted); }
-  #search:focus { outline: 2px solid var(--blue-bright); }
+  .nav-item.active, .nav-item:hover { background: var(--navy-light); color: var(--text); }
 
-  .label-pill {
-    display: block;
-    width: fit-content;
-    margin: 22px auto 20px;
-    background: linear-gradient(135deg, var(--blue), var(--blue-bright));
-    color: #fff;
-    padding: 9px 26px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 0 4px 14px rgba(28,102,179,.3);
+  .sidebar-label {
+    color: var(--muted); font-size: 11px; letter-spacing: .5px;
+    margin: 18px 6px 8px;
   }
+  .singer-chip {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 8px; border-radius: 8px; cursor: pointer;
+    margin-bottom: 2px;
+  }
+  .singer-chip:hover, .singer-chip.active { background: var(--navy-light); }
+  .singer-chip img {
+    width: 30px; height: 30px; border-radius: 7px; object-fit: cover; flex-shrink: 0;
+    background: var(--navy-light);
+  }
+  .singer-chip .meta { min-width: 0; }
+  .singer-chip .n { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .singer-chip .c { font-size: 10.5px; color: var(--muted); }
+
+  #mainArea { overflow-y: auto; padding: 22px 26px 130px; }
+
+  .search-row {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 14px; max-width: 420px; margin-bottom: 26px;
+  }
+  .search-row input {
+    background: none; border: none; color: var(--text); flex: 1; font-size: 13.5px; outline: none;
+  }
+  .search-row input::placeholder { color: var(--muted); }
 
   #grid {
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 0 16px 40px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 16px;
   }
   .singer-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 16px 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform .18s ease, box-shadow .18s ease;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; text-align: center; cursor: pointer;
+    transition: transform .15s ease, border-color .15s ease;
   }
-  .singer-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 26px rgba(47,143,224,.25);
-    border-color: var(--blue-bright);
-  }
+  .singer-card:hover { transform: translateY(-3px); border-color: var(--blue); }
   .singer-photo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin: 0 auto 10px;
-    background: var(--blue-light) center/cover no-repeat;
-    padding: 3px;
-    position: relative;
+    width: 84px; height: 84px; border-radius: 12px; margin: 0 auto 10px;
+    background: var(--navy-light) center/cover no-repeat;
   }
-  .singer-photo::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    padding: 3px;
-    background: linear-gradient(135deg, var(--blue-bright), var(--gold));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    z-index: -1;
-  }
-  .singer-name { font-weight: 700; font-size: 14.5px; }
-  .singer-count {
-    display: inline-block;
-    margin-top: 7px;
-    font-size: 11px;
-    color: var(--accent-text);
-    background: var(--blue-light);
-    padding: 3px 11px;
-    border-radius: 10px;
-  }
+  .singer-name { font-weight: 700; font-size: 13.5px; }
+  .singer-count { font-size: 10.5px; color: var(--muted); margin-top: 4px; }
 
-  #songsView {
-    display: none;
-    max-width: 620px;
-    margin: 0 auto;
-    padding: 20px 16px 110px;
-  }
-  .back-btn {
-    background: var(--blue-light);
-    border: none;
-    color: var(--accent-text);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 16px;
-    padding: 8px 16px;
-    border-radius: 12px;
-  }
-  .songs-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, var(--blue-light), var(--card2));
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-  }
-  .songs-header .singer-photo { margin: 0; width: 62px; height: 62px; }
-  .song-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 12px 16px;
-    margin-bottom: 9px;
-    cursor: pointer;
-    transition: box-shadow .15s ease;
-  }
-  .song-row:hover { box-shadow: 0 4px 16px rgba(47,143,224,.18); border-color: var(--blue-bright); }
-  .song-row .num {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--blue-light);
-    color: var(--accent-text);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; flex-shrink: 0;
-  }
-  .song-row .title { flex: 1; font-size: 14px; }
-  .empty-note {
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    padding: 40px 10px;
-  }
-
-  /* پلیر پایین با حس وینیل */
-  #player {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: linear-gradient(135deg, var(--blue-deep), var(--blue));
-    color: #fff;
-    padding: 12px 18px;
-    display: none;
-    align-items: center;
-    gap: 14px;
-    box-shadow: 0 -6px 20px rgba(13,59,102,.25);
-  }
-  #player.active { display: flex; }
-  .vinyl {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--gold) 0 3px, #1a1a1a 4px 60%, #333 61% 100%);
-    flex-shrink: 0;
-    animation: spin 3s linear infinite;
-  }
-  #player.paused .vinyl { animation-play-state: paused; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #player .info { flex: 1; min-width: 0; }
-  #player .info .t { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #player .info .s { font-size: 11px; opacity: .8; }
-  #player audio { display: none; }
-  #player button {
-    background: rgba(255,255,255,.15);
-    border: none;
-    color: #fff;
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    font-size: 15px;
-    cursor: pointer;
+  #nowPlaying { display: none; margin-bottom: 30px; }
+  #nowPlaying.active { display: flex; gap: 30px; align-items: flex-start; }
+  .np-art {
+    width: 260px; height: 260px; border-radius: 16px;
+    background: var(--navy-light) center/cover no-repeat;
+    box-shadow: 0 20px 50px rgba(0,0,0,.5);
     flex-shrink: 0;
   }
-  #player button:hover { background: rgba(255,255,255,.25); }
-  #player .mini-controls { display: flex; align-items: center; gap: 6px; }
-  #player .mini-controls button.small { width: 32px; height: 32px; font-size: 13px; }
-  #player .info { cursor: pointer; }
+  .np-info { padding-top: 10px; }
+  .np-badge {
+    display: inline-block; font-size: 11px; color: var(--blue-glow);
+    border: 1px solid var(--blue); border-radius: 20px; padding: 3px 12px; margin-bottom: 14px;
+  }
+  .np-title { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+  .np-artist { font-size: 15px; color: var(--muted); margin-bottom: 20px; }
 
-  .fav-btn {
-    background: transparent !important;
-    color: rgba(255,255,255,.65);
-    font-size: 18px !important;
-  }
-  .fav-btn.active { color: #ff4d6d; }
-  .song-row .fav-btn {
-    background: transparent !important;
-    color: var(--muted);
-    font-size: 17px;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    flex-shrink: 0;
-  }
-  .song-row .fav-btn.active { color: #ff4d6d; }
-  .song-row.playing { border-color: var(--blue-bright); background: var(--blue-light); }
-  .song-row .num.loading::after {
-    content: "";
-    display: inline-block;
-    width: 12px; height: 12px;
-    border: 2px solid var(--blue-bright);
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-  }
+  .np-seek { display: flex; align-items: center; gap: 10px; max-width: 420px; margin-bottom: 16px; }
+  .np-seek .time { font-size: 11px; color: var(--muted); min-width: 32px; text-align: center; }
+  .np-seek input[type="range"] { flex: 1; }
 
-  /* صفحه پخش تمام‌صفحه */
-  #nowPlaying {
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(160deg, var(--blue-deep), var(--blue) 55%, var(--blue-bright));
-    color: #fff;
-    z-index: 50;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    padding: 22px 24px 34px;
-  }
-  #nowPlaying.active { display: flex; }
-  .np-top {
-    width: 100%;
-    max-width: 420px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .np-top button {
-    background: rgba(255,255,255,.15);
-    border: none;
-    color: #fff;
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  .np-cover {
-    width: min(62vw, 260px);
-    height: min(62vw, 260px);
-    border-radius: 50%;
-    background: var(--blue-light) center/cover no-repeat;
-    margin: 34px auto 30px;
-    box-shadow: 0 20px 50px rgba(0,0,0,.35);
-    border: 5px solid rgba(255,255,255,.15);
-    animation: spin 8s linear infinite;
-  }
-  #nowPlaying.paused .np-cover { animation-play-state: paused; }
-  .np-title { font-size: 20px; font-weight: 700; text-align: center; }
-  .np-singer { font-size: 13px; opacity: .75; margin-top: 6px; text-align: center; }
-  .np-progress {
-    width: 100%;
-    max-width: 420px;
-    margin-top: 26px;
-  }
-  .np-progress input[type=range] {
-    width: 100%;
-    accent-color: #fff;
-  }
-  .np-times {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    opacity: .7;
-    margin-top: -4px;
-  }
-  .np-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    margin-top: 20px;
-  }
+  .np-controls { display: flex; align-items: center; gap: 18px; }
   .np-controls button {
-    background: rgba(255,255,255,.15);
-    border: none;
-    color: #fff;
-    cursor: pointer;
+    background: none; border: none; color: var(--text); cursor: pointer; font-size: 14px;
   }
-  .np-controls .np-play {
-    width: 66px; height: 66px;
-    border-radius: 50%;
-    font-size: 24px;
-    background: #fff;
-    color: var(--blue-deep);
+  .np-controls .big {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--blue); color: #fff; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(47,143,224,.6);
   }
-  .np-controls .np-nav {
-    width: 46px; height: 46px;
-    border-radius: 50%;
-    font-size: 18px;
+
+  .back-btn {
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    font-size: 13px; padding: 7px 14px; border-radius: 10px; cursor: pointer; margin-bottom: 16px;
   }
-  .np-heart {
-    margin-top: 26px;
-    background: transparent;
-    border: none;
-    color: rgba(255,255,255,.6);
-    font-size: 26px;
-    cursor: pointer;
+  .song-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 10px; border-radius: 10px; cursor: pointer;
   }
-  .np-heart.active { color: #ff4d6d; }
+  .song-row:hover { background: var(--panel); }
+  .song-row .num { width: 22px; text-align: center; color: var(--muted); font-size: 12px; flex-shrink: 0; }
+  .song-row .title { flex: 1; font-size: 13.5px; min-width: 0; }
+  .edit-title-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; }
+  .edit-title-btn:hover { color: var(--blue-glow); }
+  .empty-note { color: var(--muted); font-size: 13px; padding: 30px 4px; }
+
+  #queuePanel {
+    background: var(--navy);
+    border-right: 1px solid var(--border);
+    padding: 18px 16px;
+    overflow-y: auto;
+    display: none;
+  }
+  #queuePanel.active { display: block; }
+  .queue-title { font-size: 13.5px; font-weight: 700; border-bottom: 2px solid var(--blue); display: inline-block; padding-bottom: 8px; margin-bottom: 14px; }
+  .queue-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 6px; border-radius: 8px; cursor: pointer;
+  }
+  .queue-row:hover { background: var(--navy-light); }
+  .queue-row img {
+    width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+    background: var(--navy-light);
+  }
+  .queue-row .qt { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .queue-row .qs { font-size: 10.5px; color: var(--muted); }
+
+  #bottomPlayer {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--navy); border-top: 1px solid var(--border);
+    padding: 10px 20px;
+    display: none;
+    align-items: center;
+    gap: 18px;
+    z-index: 10;
+  }
+  #bottomPlayer.active { display: flex; }
+  .bp-track { display: flex; align-items: center; gap: 10px; width: 220px; flex-shrink: 0; }
+  .bp-art { width: 46px; height: 46px; border-radius: 8px; background: var(--navy-light) center/cover no-repeat; flex-shrink: 0; }
+  .bp-title { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bp-artist { font-size: 10.5px; color: var(--muted); }
+
+  .bp-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .bp-controls { display: flex; align-items: center; gap: 16px; }
+  .bp-controls button { background: none; border: none; color: var(--text); cursor: pointer; font-size: 13px; }
+  .bp-controls .play {
+    width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--blue-glow);
+    display: flex; align-items: center; justify-content: center; color: var(--blue-glow); font-size: 13px;
+  }
+  .bp-seek { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 520px; }
+  .bp-seek .time { font-size: 10px; color: var(--muted); min-width: 28px; text-align: center; }
+  .bp-seek input[type="range"] { flex: 1; }
+
+  input[type="range"] {
+    -webkit-appearance: none; height: 4px; border-radius: 2px;
+    background: var(--border); cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%;
+    background: var(--blue-glow); cursor: pointer;
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">P.I.F.E</div>
-  <div class="tagline">SONG</div>
-  <div class="wave">
-    <span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span>
-  </div>
-</header>
+<div id="app">
 
-<div class="search-wrap">
-  <input id="search" type="text" placeholder="جستجوی خواننده یا آهنگ" />
+  <aside id="sidebar">
+    <div class="logo-row">
+      <div class="logo-mark"></div>
+      <div class="logo-text">P.I.F.E SONG</div>
+    </div>
+    <div class="nav-item active" id="navHome">خانه</div>
+    <div class="nav-item" onclick="document.getElementById('sideSearch').focus()">جستجو</div>
+    <div class="sidebar-label">خواننده‌ها</div>
+    <div id="sidebarSingers"></div>
+  </aside>
+
+  <main id="mainArea">
+    <div class="search-row">
+      <span>جستجو</span>
+      <input id="sideSearch" type="text" placeholder="جستجوی خواننده یا آهنگ">
+    </div>
+
+    <div id="nowPlaying">
+      <div class="np-art" id="npArt"></div>
+      <div class="np-info">
+        <div class="np-badge">در حال پخش</div>
+        <div class="np-title" id="npTitle">-</div>
+        <div class="np-artist" id="npArtist">-</div>
+        <div class="np-seek">
+          <span class="time" id="npCurrent">0:00</span>
+          <input type="range" id="npSeek" min="0" max="100" value="0">
+          <span class="time" id="npTotal">0:00</span>
+        </div>
+        <div class="np-controls">
+          <button onclick="prevSong()">قبلی</button>
+          <button class="big" onclick="togglePlay()" id="npPlayBtn">▶</button>
+          <button onclick="nextSong()">بعدی</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="browseView">
+      <div id="grid"></div>
+    </div>
+
+    <div id="songsView" style="display:none;">
+      <button class="back-btn" onclick="showBrowse()">→ بازگشت به خواننده‌ها</button>
+      <div id="songsList"></div>
+    </div>
+  </main>
+
+  <aside id="queuePanel">
+    <div class="queue-title">بعدی در صف</div>
+    <div id="queueList"></div>
+  </aside>
+
 </div>
 
-<div id="pillsWrap" style="display:flex; justify-content:center; gap:10px; align-items:center;">
-  <div class="label-pill" style="margin:22px 0 20px;">خواننده‌ها</div>
-  <button class="label-pill" style="margin:22px 0 20px; background:linear-gradient(135deg,#ff4d6d,#ff8fa3); cursor:pointer; border:none;" onclick="showFavorites()">♥ علاقه‌مندی‌ها</button>
-</div>
-
-<div id="grid"></div>
-
-<div id="songsView">
-  <button class="back-btn" onclick="showGrid()">→ بازگشت</button>
-  <div class="songs-header">
-    <div class="singer-photo" id="songsPhoto"></div>
+<div id="bottomPlayer">
+  <div class="bp-track">
+    <div class="bp-art" id="bpArt"></div>
     <div>
-      <div id="songsName" style="font-weight:700;font-size:18px;"></div>
-      <div class="singer-count" id="songsCount"></div>
+      <div class="bp-title" id="bpTitle">-</div>
+      <div class="bp-artist" id="bpArtist">-</div>
     </div>
   </div>
-  <div id="songsList"></div>
-</div>
-
-<div id="player">
-  <div class="vinyl" onclick="openNowPlaying()"></div>
-  <div class="info" onclick="openNowPlaying()">
-    <div class="t" id="pTitle">-</div>
-    <div class="s" id="pSinger">-</div>
-  </div>
-  <div class="mini-controls">
-    <button class="small fav-btn" id="miniFavBtn" onclick="toggleFavoriteCurrent(event)">♡</button>
-    <button class="small" onclick="prevSong(event)">⏮</button>
-    <button onclick="togglePlay(event)" id="playBtn">▶</button>
-    <button class="small" onclick="nextSong(event)">⏭</button>
-  </div>
-  <audio id="audio" preload="auto"></audio>
-</div>
-
-<div id="nowPlaying">
-  <div class="np-top">
-    <button onclick="closeNowPlaying()">✕</button>
-    <div style="font-size:12px;opacity:.8;">در حال پخش</div>
-    <div style="width:38px;"></div>
-  </div>
-  <div class="np-cover" id="npCover"></div>
-  <div class="np-title" id="npTitle">-</div>
-  <div class="np-singer" id="npSinger">-</div>
-  <div class="np-progress">
-    <input type="range" id="npSeek" min="0" max="100" value="0">
-    <div class="np-times">
-      <span id="npCur">0:00</span>
-      <span id="npDur">0:00</span>
+  <div class="bp-center">
+    <div class="bp-controls">
+      <button onclick="prevSong()">قبلی</button>
+      <button class="play" onclick="togglePlay()" id="bpPlayBtn">▶</button>
+      <button onclick="nextSong()">بعدی</button>
+    </div>
+    <div class="bp-seek">
+      <span class="time" id="bpCurrent">0:00</span>
+      <input type="range" id="bpSeek" min="0" max="100" value="0">
+      <span class="time" id="bpTotal">0:00</span>
     </div>
   </div>
-  <div class="np-controls">
-    <button class="np-nav" onclick="prevSong(event)">⏮</button>
-    <button class="np-play" onclick="togglePlay(event)" id="npPlayBtn">▶</button>
-    <button class="np-nav" onclick="nextSong(event)">⏭</button>
-  </div>
-  <button class="np-heart" id="npHeartBtn" onclick="toggleFavoriteCurrent(event)">♡</button>
 </div>
+
+<audio id="audio"></audio>
 
 <script>
-// آدرس ریپازیتوری GitHub شما
 const GH_USER = "rezaeian1388-bot";
 const GH_REPO = "P.I.F.E";
-const BASE_URL = `https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main`;
 const API_URL = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/songs`;
 
-// همه ۱۷ خواننده. "slug" = اسم پوشه‌ای که باید توی songs/ بسازید (لاتین، ساده)
 const singers = [
-  { id: 1,  name: "گوگوش",          slug: "googoosh",              photo: "1.jpg",  songs: [] },
-  { id: 2,  name: "هایده",          slug: "hayedeh",               photo: "2.jpg",  songs: [] },
-  { id: 3,  name: "مهستی",          slug: "mahasti",               photo: "3.jpg",  songs: [] },
-  { id: 4,  name: "حمیرا",          slug: "homeira",               photo: "4.jpg",  songs: [] },
-  { id: 5,  name: "ویگن",           slug: "vigen",                 photo: "5.jpg",  songs: [] },
-  { id: 6,  name: "داریوش",         slug: "dariush",               photo: "6.jpg",  songs: [] },
-  { id: 7,  name: "ابی",            slug: "ebi",                   photo: "7.jpg",  songs: [] },
-  { id: 8,  name: "عارف",           slug: "aref",                  photo: "8.jpg",  songs: [] },
-  { id: 9,  name: "سیاوش قمیشی",    slug: "siavash-ghomayshi",     photo: "9.jpg",  songs: [] },
-  { id: 10, name: "ستار",           slug: "sattar",                photo: "10.jpg", songs: [] },
-  { id: 11, name: "شاهرخ",          slug: "shahrokh",              photo: "11.jpg", songs: [] },
-  { id: 12, name: "حسن شماعی‌زاده", slug: "hassan-shamaeezadeh",   photo: "12.jpg", songs: [] },
-  { id: 13, name: "معین",           slug: "moein",                 photo: "13.jpg", songs: [] },
-  { id: 14, name: "حبیب",           slug: "habib",                 photo: "14.jpg", songs: [] },
-  { id: 15, name: "لیلا فروهر",     slug: "leila-forouhar",        photo: "15.jpg", songs: [] },
-  { id: 16, name: "ایرج",           slug: "iraj",                  photo: "16.jpg", songs: [] },
-  { id: 17, name: "فتانه",          slug: "fataneh",               photo: "17.jpg", songs: [] }
+  { id: 1,  name: "گوگوش",          slug: "googoosh",            photo: "1.jpg"  },
+  { id: 2,  name: "هایده",          slug: "hayedeh",             photo: "2.jpg"  },
+  { id: 3,  name: "مهستی",          slug: "mahasti",             photo: "3.jpg"  },
+  { id: 4,  name: "حمیرا",          slug: "homeira",             photo: "4.jpg"  },
+  { id: 5,  name: "ویگن",           slug: "vigen",                photo: "5.jpg"  },
+  { id: 6,  name: "داریوش",         slug: "dariush",              photo: "6.jpg"  },
+  { id: 7,  name: "ابی",            slug: "ebi",                  photo: "7.jpg"  },
+  { id: 8,  name: "عارف",           slug: "aref",                 photo: "8.jpg"  },
+  { id: 9,  name: "سیاوش قمیشی",    slug: "siavash-ghomayshi",   photo: "9.jpg"  },
+  { id: 10, name: "ستار",           slug: "sattar",               photo: "10.jpg" },
+  { id: 11, name: "شاهرخ",          slug: "shahrokh",             photo: "11.jpg" },
+  { id: 12, name: "حسن شماعی‌زاده", slug: "hassan-shamaeezadeh", photo: "12.jpg" },
+  { id: 13, name: "معین",           slug: "moein",                photo: "13.jpg" },
+  { id: 14, name: "حبیب",           slug: "habib",                photo: "14.jpg" },
+  { id: 15, name: "لیلا فروهر",     slug: "leila-forouhar",      photo: "15.jpg" },
+  { id: 16, name: "ایرج",           slug: "iraj",                 photo: "16.jpg" },
+  { id: 17, name: "فتانه",          slug: "fataneh",              photo: "17.jpg" }
 ];
 
-// تبدیل تقریبی فینگیلیش به فارسی (بهترین حدس، نه ترجمه دقیق)
+const RAW_BASE = `https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main`;
+function photoURL(photo) { return `${RAW_BASE}/${photo}`; }
+
 function finglishToPersian(text) {
   let s = text.toLowerCase();
   const map = [
@@ -525,376 +346,215 @@ function finglishToPersian(text) {
   }
   return out;
 }
-
-// پاکسازی اسم فایل: حذف پسوند، پرانتز، عدد کیفیت، خط تیره/زیرخط، اسم خواننده
 function cleanTitle(filename, singerSlug) {
   let name = filename.replace(/\.[a-zA-Z0-9]+$/, '');
-  name = name.replace(/\(.*?\)/g, ' ');
+  name = name.replace(/\(.*?\)/g, ' ').replace(/\[.*?\]/g, ' ');
   name = name.replace(/[_-]/g, ' ');
   name = name.replace(/\b\d{2,4}\b/g, ' ');
   const singerRegex = new RegExp(singerSlug.replace(/-/g, '.?'), 'gi');
-  name = name.replace(singerRegex, ' ');
-  name = name.trim().replace(/\s+/g, ' ');
+  name = name.replace(singerRegex, ' ').trim().replace(/\s+/g, ' ');
   return finglishToPersian(name) || name;
 }
+function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
-// لیست کل پوشه اصلی songs/ رو یکبار می‌گیریم و کش می‌کنیم (هم زیرپوشه‌ها هم فایل‌های تنها)
-let rootListingPromise = null;
-async function getRootListing() {
-  if (!rootListingPromise) {
-    rootListingPromise = fetch(API_URL)
-      .then(r => (r.ok ? r.json() : []))
-      .catch(() => []);
+let _rootFilesPromise = null;
+function fetchRootFiles() {
+  if (!_rootFilesPromise) {
+    _rootFilesPromise = fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/`)
+      .then(r => r.ok ? r.json() : []).catch(() => []);
   }
-  const data = await rootListingPromise;
-  return Array.isArray(data) ? data : [];
+  return _rootFilesPromise;
 }
 
-// آیا اسم فایل به این خواننده تعلق داره؟ (برای فایل‌هایی که مستقیم توی songs/ ریخته شدن، بدون زیرپوشه)
-function matchesSinger(filename, singer) {
-  const lower = filename.toLowerCase().replace(/[_\-.]/g, ' ');
-  const slugParts = singer.slug.split('-');
-  // هر بخش از اسلاگ باید توی اسم فایل باشه (مثلاً «siavash» و «ghomayshi» هردو)
-  return slugParts.every(part => lower.includes(part));
-}
-
-// خواندن لیست آهنگ‌های هر خواننده: هم از زیرپوشه songs/{slug}/ و هم فایل‌های تنها داخل songs/
 async function fetchSongs(singer) {
+  const results = [];
   try {
-    const [subData, rootListing] = await Promise.all([
-      fetch(`${API_URL}/${singer.slug}`).then(r => (r.ok ? r.json() : [])).catch(() => []),
-      getRootListing()
-    ]);
-
-    const subSongs = (Array.isArray(subData) ? subData : [])
-      .filter(f => f.type === 'file')
-      .map(f => ({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
-
-    const rootSongs = rootListing
-      .filter(f => f.type === 'file' && matchesSinger(f.name, singer))
-      .map(f => ({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
-
-    // ادغام و حذف موارد تکراری بر اساس آدرس فایل
-    const seen = new Set();
-    return [...subSongs, ...rootSongs].filter(s => {
-      if (seen.has(s.file)) return false;
-      seen.add(s.file);
-      return true;
-    });
-  } catch (e) {
-    return [];
-  }
+    const res = await fetch(`${API_URL}/${singer.slug}`);
+    if (res.ok) {
+      const data = await res.json();
+      data.filter(f => f.type === 'file' && f.name !== 'placeholder.txt')
+        .forEach(f => results.push({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
+    }
+  } catch (e) {}
+  const rootFiles = await fetchRootFiles();
+  const slugNorm = normalize(singer.slug.replace(/-/g, ''));
+  rootFiles
+    .filter(f => f.type === 'file' && /\.(mp3|m4a|wav|aac)$/i.test(f.name))
+    .filter(f => normalize(f.name).startsWith(slugNorm))
+    .forEach(f => results.push({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
+  return results;
 }
+
+function getTitleOverride(fileUrl) { try { return localStorage.getItem('title:' + fileUrl); } catch (e) { return null; } }
+function setTitleOverride(fileUrl, title) { try { localStorage.setItem('title:' + fileUrl, title); } catch (e) {} }
+
+const sidebarSingers = document.getElementById('sidebarSingers');
+function renderSidebar() {
+  sidebarSingers.innerHTML = '';
+  singers.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'singer-chip';
+    chip.onclick = () => openSinger(s.id);
+    chip.innerHTML = `<img src="${photoURL(s.photo)}" onerror="this.style.display='none'">
+      <div class="meta"><div class="n">${s.name}</div><div class="c">خواننده</div></div>`;
+    sidebarSingers.appendChild(chip);
+  });
+}
+renderSidebar();
 
 const grid = document.getElementById('grid');
-const songsView = document.getElementById('songsView');
-const searchInput = document.getElementById('search');
-
-function photoStyle(photo) {
-  return `background-image:url('${BASE_URL}/${photo}')`;
-}
-
 function renderGrid(list) {
   grid.innerHTML = '';
   list.forEach(s => {
     const card = document.createElement('div');
     card.className = 'singer-card';
     card.onclick = () => openSinger(s.id);
-    const countLabel = s.loaded ? `${s.songs.length} آهنگ` : '...';
-    card.innerHTML = `
-      <div class="singer-photo" style="${photoStyle(s.photo)}"></div>
-      <div class="singer-name">${s.name}</div>
-      <div class="singer-count">${countLabel}</div>
-    `;
+    card.innerHTML = `<div class="singer-photo" style="background-image:url('${photoURL(s.photo)}')"></div>
+      <div class="singer-name">${s.name}</div><div class="singer-count">خواننده</div>`;
     grid.appendChild(card);
   });
 }
+renderGrid(singers);
 
-// از ابتدا تعداد آهنگ‌های همه خواننده‌ها رو موازی می‌گیریم تا کارت‌ها عدد درست نشون بدن
-async function preloadAllCounts() {
-  await Promise.all(singers.map(async s => {
-    s.songs = await fetchSongs(s);
-    s.loaded = true;
-  }));
-  renderGrid(singers);
+document.getElementById('sideSearch').addEventListener('input', (e) => {
+  const q = e.target.value.trim();
+  showBrowse();
+  renderGrid(q ? singers.filter(s => s.name.includes(q)) : singers);
+});
+
+function showBrowse() {
+  document.getElementById('browseView').style.display = 'block';
+  document.getElementById('songsView').style.display = 'none';
 }
 
-searchInput.addEventListener('input', () => {
-  const q = searchInput.value.trim();
-  if (!q) { renderGrid(singers); return; }
-  const filtered = singers.filter(s =>
-    s.name.includes(q) || s.songs.some(sg => sg.title.includes(q))
-  );
-  renderGrid(filtered);
-});
+let currentSinger = null;
+let currentQueue = [];
+let currentIndex = -1;
 
 async function openSinger(id) {
   const s = singers.find(x => x.id === id);
-  document.querySelector('.search-wrap').style.display = 'none';
-  document.getElementById('pillsWrap').style.display = 'none';
-  grid.style.display = 'none';
-  songsView.style.display = 'block';
-
-  document.getElementById('songsPhoto').style = photoStyle(s.photo);
-  document.getElementById('songsName').textContent = s.name;
+  currentSinger = s;
+  document.getElementById('browseView').style.display = 'none';
+  document.getElementById('songsView').style.display = 'block';
 
   const list = document.getElementById('songsList');
-  let songs;
-  if (s.loaded) {
-    songs = s.songs;
-    document.getElementById('songsCount').textContent = songs.length + ' آهنگ';
-  } else {
-    document.getElementById('songsCount').textContent = '...';
-    list.innerHTML = `<div class="empty-note">در حال دریافت آهنگ‌ها...</div>`;
-    songs = await fetchSongs(s);
-    s.songs = songs;
-    s.loaded = true;
-    document.getElementById('songsCount').textContent = songs.length + ' آهنگ';
-  }
+  list.innerHTML = `<div class="empty-note">در حال دریافت آهنگ‌های ${s.name}...</div>`;
+
+  const songs = await fetchSongs(s);
+  songs.forEach(song => {
+    const ov = getTitleOverride(song.file);
+    if (ov) song.title = ov;
+  });
+  currentQueue = songs;
 
   if (songs.length === 0) {
-    list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} پیدا نشد. یا آهنگ رو توی پوشه songs/${s.slug}/ بذارید، یا مستقیم توی پوشه songs/ آپلودش کنید و اسم فایلش شامل «${s.slug}» باشه.</div>`;
+    list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} آپلود نشده.</div>`;
     return;
   }
   list.innerHTML = '';
   songs.forEach((song, i) => {
     const row = document.createElement('div');
     row.className = 'song-row';
-    row.dataset.file = song.file;
-    row.onclick = () => { playSong(songs, i, s.name, s.photo); openNowPlaying(); };
-    const fav = isFavorite(song) ? 'active' : '';
-    const favBtn = document.createElement('button');
-    favBtn.className = 'fav-btn ' + fav;
-    favBtn.textContent = fav ? '♥' : '♡';
-    favBtn.onclick = (e) => { e.stopPropagation(); toggleFavoriteSong(song, s.name, favBtn); };
-    row.innerHTML = `<span class="num">${i + 1}</span><span class="title">${song.title}</span>`;
-    row.appendChild(favBtn);
-    const playSpan = document.createElement('span');
-    playSpan.textContent = '▶';
-    row.appendChild(playSpan);
-    list.appendChild(row);
-  });
-  markPlayingRow();
-}
 
-function showFavorites() {
-  const favs = getFavorites();
-  document.querySelector('.search-wrap').style.display = 'none';
-  document.getElementById('pillsWrap').style.display = 'none';
-  grid.style.display = 'none';
-  songsView.style.display = 'block';
+    const num = document.createElement('span');
+    num.className = 'num'; num.textContent = i + 1;
+    num.onclick = () => playAt(i);
 
-  document.getElementById('songsPhoto').style = 'background:linear-gradient(135deg,#ff4d6d,#ff8fa3)';
-  document.getElementById('songsPhoto').innerHTML = '';
-  document.getElementById('songsName').textContent = 'علاقه‌مندی‌ها';
-  document.getElementById('songsCount').textContent = favs.length + ' آهنگ';
+    const title = document.createElement('span');
+    title.className = 'title'; title.textContent = song.title;
+    title.onclick = () => playAt(i);
 
-  const list = document.getElementById('songsList');
-  if (favs.length === 0) {
-    list.innerHTML = `<div class="empty-note">هنوز آهنگی را به علاقه‌مندی‌ها اضافه نکرده‌اید. روی قلب کنار هر آهنگ بزنید ♡</div>`;
-    return;
-  }
-  const favSongs = favs.map(f => ({ title: f.title, file: f.file }));
-  list.innerHTML = '';
-  favSongs.forEach((song, i) => {
-    const row = document.createElement('div');
-    row.className = 'song-row';
-    row.dataset.file = song.file;
-    row.onclick = () => { playSong(favSongs, i, favs[i].singer); openNowPlaying(); };
-    const favBtn = document.createElement('button');
-    favBtn.className = 'fav-btn active';
-    favBtn.textContent = '♥';
-    favBtn.onclick = (e) => {
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-title-btn'; editBtn.textContent = '✎'; editBtn.title = 'ویرایش اسم';
+    editBtn.onclick = (e) => {
       e.stopPropagation();
-      toggleFavoriteSong(song, favs[i].singer, favBtn);
-      showFavorites();
+      const nt = prompt('اسم درست آهنگ رو بنویسید:', song.title);
+      if (nt && nt.trim()) {
+        song.title = nt.trim();
+        setTitleOverride(song.file, song.title);
+        title.textContent = song.title;
+        renderQueue();
+      }
     };
-    row.innerHTML = `<span class="num">${i + 1}</span><span class="title">${song.title}</span>`;
-    row.appendChild(favBtn);
-    const playSpan = document.createElement('span');
-    playSpan.textContent = '▶';
-    row.appendChild(playSpan);
+
+    row.appendChild(num); row.appendChild(title); row.appendChild(editBtn);
     list.appendChild(row);
   });
-  markPlayingRow();
-}
-
-function showGrid() {
-  document.querySelector('.search-wrap').style.display = 'block';
-  document.getElementById('pillsWrap').style.display = 'flex';
-  grid.style.display = 'grid';
-  songsView.style.display = 'none';
 }
 
 const audio = document.getElementById('audio');
-const player = document.getElementById('player');
-const playBtn = document.getElementById('playBtn');
 const nowPlaying = document.getElementById('nowPlaying');
-const npPlayBtn = document.getElementById('npPlayBtn');
-const npSeek = document.getElementById('npSeek');
-const npCur = document.getElementById('npCur');
-const npDur = document.getElementById('npDur');
-const miniFavBtn = document.getElementById('miniFavBtn');
-const npHeartBtn = document.getElementById('npHeartBtn');
+const bottomPlayer = document.getElementById('bottomPlayer');
+const queuePanel = document.getElementById('queuePanel');
 
-// ------- علاقه‌مندی‌ها (localStorage) -------
-const FAV_KEY = 'pife_favorites';
-function getFavorites() {
-  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
-  catch (e) { return []; }
+function formatTime(sec) {
+  if (!isFinite(sec)) return '0:00';
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
 }
-function saveFavorites(list) {
-  localStorage.setItem(FAV_KEY, JSON.stringify(list));
+
+function playAt(index) {
+  if (!currentQueue[index]) return;
+  currentIndex = index;
+  const song = currentQueue[index];
+  audio.src = song.file;
+  audio.play();
+
+  const art = photoURL(currentSinger.photo);
+  document.getElementById('npArt').style.backgroundImage = `url('${art}')`;
+  document.getElementById('npTitle').textContent = song.title;
+  document.getElementById('npArtist').textContent = currentSinger.name;
+  document.getElementById('bpArt').style.backgroundImage = `url('${art}')`;
+  document.getElementById('bpTitle').textContent = song.title;
+  document.getElementById('bpArtist').textContent = currentSinger.name;
+
+  nowPlaying.classList.add('active');
+  bottomPlayer.classList.add('active');
+  queuePanel.classList.add('active');
+  setPlayIcon('⏸');
+  renderQueue();
 }
-function isFavorite(song) {
-  return getFavorites().some(f => f.file === song.file);
+function nextSong() { if (currentIndex + 1 < currentQueue.length) playAt(currentIndex + 1); }
+function prevSong() { if (currentIndex > 0) playAt(currentIndex - 1); }
+audio.addEventListener('ended', nextSong);
+
+function setPlayIcon(icon) {
+  document.getElementById('npPlayBtn').textContent = icon;
+  document.getElementById('bpPlayBtn').textContent = icon;
 }
-function toggleFavoriteSong(song, singerName, btnEl) {
-  let favs = getFavorites();
-  const idx = favs.findIndex(f => f.file === song.file);
-  if (idx >= 0) {
-    favs.splice(idx, 1);
-    if (btnEl) { btnEl.classList.remove('active'); btnEl.textContent = '♡'; }
-  } else {
-    favs.push({ file: song.file, title: song.title, singer: singerName });
-    if (btnEl) { btnEl.classList.add('active'); btnEl.textContent = '♥'; }
-  }
-  saveFavorites(favs);
-  refreshHeartButtons();
+function togglePlay() {
+  if (!audio.src) return;
+  if (audio.paused) { audio.play(); setPlayIcon('⏸'); }
+  else { audio.pause(); setPlayIcon('▶'); }
 }
-function toggleFavoriteCurrent(e) {
-  if (e) e.stopPropagation();
-  if (!currentList.length) return;
-  const song = currentList[currentIndex];
-  toggleFavoriteSong(song, currentSinger, null);
-  refreshHeartButtons();
-  // به‌روزرسانی دکمه قلب داخل لیست آهنگ‌ها هم اگر همان صفحه باز است
-  const row = document.querySelector(`.song-row[data-file="${CSS.escape(song.file)}"] .fav-btn`);
-  if (row) {
-    const active = isFavorite(song);
-    row.classList.toggle('active', active);
-    row.textContent = active ? '♥' : '♡';
-  }
-}
-function refreshHeartButtons() {
-  if (!currentList.length) return;
-  const active = isFavorite(currentList[currentIndex]);
-  [miniFavBtn, npHeartBtn].forEach(btn => {
-    btn.classList.toggle('active', active);
-    btn.textContent = active ? '♥' : '♡';
+
+function renderQueue() {
+  const list = document.getElementById('queueList');
+  list.innerHTML = '';
+  currentQueue.forEach((song, i) => {
+    if (i === currentIndex) return;
+    const row = document.createElement('div');
+    row.className = 'queue-row';
+    row.onclick = () => playAt(i);
+    row.innerHTML = `<img src="${photoURL(currentSinger.photo)}">
+      <div><div class="qt">${song.title}</div><div class="qs">${currentSinger.name}</div></div>`;
+    list.appendChild(row);
   });
 }
 
-// ------- پخش‌کننده -------
-let currentList = [];
-let currentIndex = -1;
-let currentSinger = '';
-let currentSingerPhoto = '';
-
-function markPlayingRow() {
-  document.querySelectorAll('.song-row').forEach(r => r.classList.remove('playing'));
-  if (currentIndex >= 0 && currentList[currentIndex]) {
-    const row = document.querySelector(`.song-row[data-file="${CSS.escape(currentList[currentIndex].file)}"]`);
-    if (row) row.classList.add('playing');
-  }
+function wireSeek(seekEl, curEl, totEl) {
+  audio.addEventListener('loadedmetadata', () => {
+    seekEl.max = audio.duration; totEl.textContent = formatTime(audio.duration);
+  });
+  audio.addEventListener('timeupdate', () => {
+    if (!seekEl.dragging) { seekEl.value = audio.currentTime; curEl.textContent = formatTime(audio.currentTime); }
+  });
+  seekEl.addEventListener('input', () => { seekEl.dragging = true; curEl.textContent = formatTime(seekEl.value); });
+  seekEl.addEventListener('change', () => { audio.currentTime = seekEl.value; seekEl.dragging = false; });
 }
-
-function playSong(list, index, singerName, singerPhoto) {
-  currentList = list;
-  currentIndex = index;
-  currentSinger = singerName;
-  if (singerPhoto) currentSingerPhoto = singerPhoto;
-  const song = list[index];
-  if (!song) return;
-
-  audio.src = song.file;
-  audio.play().catch(() => {});
-  player.classList.add('active');
-  player.classList.remove('paused');
-  nowPlaying.classList.remove('paused');
-  document.getElementById('pTitle').textContent = song.title;
-  document.getElementById('pSinger').textContent = singerName;
-  playBtn.textContent = '⏸';
-
-  document.getElementById('npTitle').textContent = song.title;
-  document.getElementById('npSinger').textContent = singerName;
-  npPlayBtn.textContent = '⏸';
-  if (currentSingerPhoto) {
-    document.getElementById('npCover').style.backgroundImage = `url('${BASE_URL}/${currentSingerPhoto}')`;
-  }
-  npSeek.value = 0;
-  npCur.textContent = '0:00';
-  npDur.textContent = '0:00';
-
-  refreshHeartButtons();
-  markPlayingRow();
-}
-
-function nextSong(e) {
-  if (e) e.stopPropagation();
-  if (!currentList.length) return;
-  const newIndex = (currentIndex + 1) % currentList.length;
-  playSong(currentList, newIndex, currentSinger, currentSingerPhoto);
-}
-
-function prevSong(e) {
-  if (e) e.stopPropagation();
-  if (!currentList.length) return;
-  const newIndex = (currentIndex - 1 + currentList.length) % currentList.length;
-  playSong(currentList, newIndex, currentSinger, currentSingerPhoto);
-}
-
-function togglePlay(e) {
-  if (e) e.stopPropagation();
-  if (audio.paused) {
-    audio.play().catch(() => {});
-    playBtn.textContent = '⏸';
-    npPlayBtn.textContent = '⏸';
-    player.classList.remove('paused');
-    nowPlaying.classList.remove('paused');
-  } else {
-    audio.pause();
-    playBtn.textContent = '▶';
-    npPlayBtn.textContent = '▶';
-    player.classList.add('paused');
-    nowPlaying.classList.add('paused');
-  }
-}
-
-// وقتی آهنگ تمام شد، خودکار برو سراغ بعدی
-audio.addEventListener('ended', () => nextSong());
-
-// نوار پیشرفت
-function formatTime(t) {
-  if (!isFinite(t)) return '0:00';
-  const m = Math.floor(t / 60);
-  const s = Math.floor(t % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
-}
-audio.addEventListener('timeupdate', () => {
-  if (audio.duration) {
-    npSeek.value = (audio.currentTime / audio.duration) * 100;
-    npCur.textContent = formatTime(audio.currentTime);
-    npDur.textContent = formatTime(audio.duration);
-  }
-});
-npSeek.addEventListener('input', () => {
-  if (audio.duration) {
-    audio.currentTime = (npSeek.value / 100) * audio.duration;
-  }
-});
-
-// صفحه تمام‌صفحه پخش
-function openNowPlaying() {
-  if (!currentList.length) return;
-  nowPlaying.classList.add('active');
-}
-function closeNowPlaying() {
-  nowPlaying.classList.remove('active');
-}
-
-renderGrid(singers);
-preloadAllCounts();
+wireSeek(document.getElementById('npSeek'), document.getElementById('npCurrent'), document.getElementById('npTotal'));
+wireSeek(document.getElementById('bpSeek'), document.getElementById('bpCurrent'), document.getElementById('bpTotal'));
 </script>
 
 </body>
