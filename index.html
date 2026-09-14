@@ -538,15 +538,49 @@ function cleanTitle(filename, singerSlug) {
   return finglishToPersian(name) || name;
 }
 
-// خواندن لیست فایل‌های آهنگ هر خواننده مستقیم از GitHub
+// لیست کل پوشه اصلی songs/ رو یکبار می‌گیریم و کش می‌کنیم (هم زیرپوشه‌ها هم فایل‌های تنها)
+let rootListingPromise = null;
+async function getRootListing() {
+  if (!rootListingPromise) {
+    rootListingPromise = fetch(API_URL)
+      .then(r => (r.ok ? r.json() : []))
+      .catch(() => []);
+  }
+  const data = await rootListingPromise;
+  return Array.isArray(data) ? data : [];
+}
+
+// آیا اسم فایل به این خواننده تعلق داره؟ (برای فایل‌هایی که مستقیم توی songs/ ریخته شدن، بدون زیرپوشه)
+function matchesSinger(filename, singer) {
+  const lower = filename.toLowerCase().replace(/[_\-.]/g, ' ');
+  const slugParts = singer.slug.split('-');
+  // هر بخش از اسلاگ باید توی اسم فایل باشه (مثلاً «siavash» و «ghomayshi» هردو)
+  return slugParts.every(part => lower.includes(part));
+}
+
+// خواندن لیست آهنگ‌های هر خواننده: هم از زیرپوشه songs/{slug}/ و هم فایل‌های تنها داخل songs/
 async function fetchSongs(singer) {
   try {
-    const res = await fetch(`${API_URL}/${singer.slug}`);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data
+    const [subData, rootListing] = await Promise.all([
+      fetch(`${API_URL}/${singer.slug}`).then(r => (r.ok ? r.json() : [])).catch(() => []),
+      getRootListing()
+    ]);
+
+    const subSongs = (Array.isArray(subData) ? subData : [])
       .filter(f => f.type === 'file')
       .map(f => ({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
+
+    const rootSongs = rootListing
+      .filter(f => f.type === 'file' && matchesSinger(f.name, singer))
+      .map(f => ({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
+
+    // ادغام و حذف موارد تکراری بر اساس آدرس فایل
+    const seen = new Set();
+    return [...subSongs, ...rootSongs].filter(s => {
+      if (seen.has(s.file)) return false;
+      seen.add(s.file);
+      return true;
+    });
   } catch (e) {
     return [];
   }
@@ -619,7 +653,7 @@ async function openSinger(id) {
   }
 
   if (songs.length === 0) {
-    list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} آپلود نشده (پوشه songs/${s.slug}/ رو چک کنید).</div>`;
+    list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} پیدا نشد. یا آهنگ رو توی پوشه songs/${s.slug}/ بذارید، یا مستقیم توی پوشه songs/ آپلودش کنید و اسم فایلش شامل «${s.slug}» باشه.</div>`;
     return;
   }
   list.innerHTML = '';
