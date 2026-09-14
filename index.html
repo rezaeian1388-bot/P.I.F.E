@@ -297,6 +297,7 @@
 
 <audio id="audio"></audio>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.7/jsmediatags.min.js"></script>
 <script>
 const GH_USER = "rezaeian1388-bot";
 const GH_REPO = "P.I.F.E";
@@ -501,19 +502,56 @@ function playAt(index) {
   audio.src = song.file;
   audio.play();
 
-  const art = photoURL(currentSinger.photo);
-  document.getElementById('npArt').style.backgroundImage = `url('${art}')`;
-  document.getElementById('npTitle').textContent = song.title;
-  document.getElementById('npArtist').textContent = currentSinger.name;
-  document.getElementById('bpArt').style.backgroundImage = `url('${art}')`;
-  document.getElementById('bpTitle').textContent = song.title;
-  document.getElementById('bpArtist').textContent = currentSinger.name;
+  const fallbackArt = photoURL(currentSinger.photo);
+  setArtwork(fallbackArt, song, currentSinger);
+
+  // تلاش برای خوندن عکس ذخیره‌شده داخل خود فایل mp3
+  if (typeof jsmediatags !== 'undefined') {
+    jsmediatags.read(song.file, {
+      onSuccess: function (tag) {
+        if (currentIndex !== index) return; // کاربر آهنگ رو عوض کرده، این نتیجه دیگه لازم نیست
+        const pic = tag.tags.picture;
+        if (pic) {
+          let base64 = '';
+          for (let i = 0; i < pic.data.length; i++) base64 += String.fromCharCode(pic.data[i]);
+          const dataUrl = `data:${pic.format};base64,${window.btoa(base64)}`;
+          setArtwork(dataUrl, song, currentSinger);
+        }
+      },
+      onError: function () { /* عکسی توی فایل نبود، همون عکس خواننده می‌مونه */ }
+    });
+  }
 
   nowPlaying.classList.add('active');
   bottomPlayer.classList.add('active');
   queuePanel.classList.add('active');
   setPlayIcon('⏸');
   renderQueue();
+}
+
+function setArtwork(art, song, singer) {
+  document.getElementById('npArt').style.backgroundImage = `url('${art}')`;
+  document.getElementById('npTitle').textContent = song.title;
+  document.getElementById('npArtist').textContent = singer.name;
+  document.getElementById('bpArt').style.backgroundImage = `url('${art}')`;
+  document.getElementById('bpTitle').textContent = song.title;
+  document.getElementById('bpArtist').textContent = singer.name;
+
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: singer.name,
+      album: 'P.I.F.E SONG',
+      artwork: [
+        { src: art, sizes: '256x256', type: 'image/jpeg' },
+        { src: art, sizes: '512x512', type: 'image/jpeg' }
+      ]
+    });
+    navigator.mediaSession.setActionHandler('play', () => { audio.play(); setPlayIcon('⏸'); });
+    navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); setPlayIcon('▶'); });
+    navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+    navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+  }
 }
 function nextSong() { if (currentIndex + 1 < currentQueue.length) playAt(currentIndex + 1); }
 function prevSong() { if (currentIndex > 0) playAt(currentIndex - 1); }
