@@ -582,7 +582,23 @@ async function adminSaveAll() {
 
     if (putRes.ok) {
       globalOverrides = current;
+      globalOverridesLoaded = true;
       status.textContent = 'ذخیره شد! این تغییر برای همه اعمال میشه.';
+
+      // آپدیت فوری لیست آهنگ‌های خواننده‌ای که الان بازه، بدون نیاز به رفرش دستی
+      if (currentSinger) {
+        currentQueue.forEach(song => {
+          if (globalOverrides[song.file]) song.title = globalOverrides[song.file];
+        });
+        const songsList = document.getElementById('songsList');
+        if (songsList) {
+          const titleEls = songsList.querySelectorAll('[data-song-file]');
+          titleEls.forEach(el => {
+            const file = el.dataset.songFile;
+            if (globalOverrides[file]) el.textContent = globalOverrides[file];
+          });
+        }
+      }
     } else {
       const err = await putRes.json();
       status.textContent = 'خطا: ' + (err.message || 'ذخیره نشد. توکن رو چک کنید.');
@@ -676,6 +692,7 @@ async function openSinger(id) {
 
     const title = document.createElement('span');
     title.className = 'title'; title.textContent = song.title;
+    title.dataset.songFile = song.file;
     title.onclick = () => playAt(i);
 
     const editBtn = document.createElement('button');
