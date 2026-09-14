@@ -105,21 +105,49 @@
     border-radius: 14px; padding: 14px; text-align: center; cursor: pointer;
     transition: transform .15s ease, border-color .15s ease;
   }
-  .singer-card:hover { transform: translateY(-3px); border-color: var(--blue); }
+  .singer-card:hover { transform: translateY(-3px); border-color: var(--blue); box-shadow: 0 14px 28px rgba(0,0,0,.35); }
   .singer-photo {
     width: 84px; height: 84px; border-radius: 12px; margin: 0 auto 10px;
     background: var(--navy-light) center/cover no-repeat;
+    position: relative; overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,.35);
+  }
+  .singer-photo::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,.2), transparent 40%);
   }
   .singer-name { font-weight: 700; font-size: 13.5px; }
   .singer-count { font-size: 10.5px; color: var(--muted); margin-top: 4px; }
 
-  #nowPlaying { display: none; margin-bottom: 30px; }
+  #nowPlaying { display: none; margin-bottom: 30px; position: relative; }
   #nowPlaying.active { display: flex; gap: 30px; align-items: flex-start; }
+  #nowPlaying::before {
+    content: "";
+    position: absolute;
+    top: -30px; right: -30px; left: -30px; bottom: -30px;
+    background: var(--np-bg, none);
+    background-size: cover;
+    background-position: center;
+    filter: blur(60px) brightness(.35) saturate(1.3);
+    z-index: -1;
+    border-radius: 24px;
+    opacity: .8;
+    transition: background-image .4s ease;
+  }
   .np-art {
     width: 260px; height: 260px; border-radius: 16px;
     background: var(--navy-light) center/cover no-repeat;
-    box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    box-shadow: 0 25px 60px rgba(0,0,0,.55), 0 0 40px rgba(47,143,224,.25);
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .np-art::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(115deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.05) 22%, transparent 45%);
+    pointer-events: none;
   }
   .np-info { padding-top: 10px; }
   .np-badge {
@@ -139,9 +167,15 @@
   }
   .np-controls .big {
     width: 52px; height: 52px; border-radius: 50%;
-    background: var(--blue); color: #fff; font-size: 18px;
+    background: radial-gradient(circle at 35% 30%, var(--blue-glow), var(--blue) 75%);
+    color: #fff; font-size: 18px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 20px rgba(47,143,224,.6);
+    box-shadow: 0 0 0 4px rgba(47,143,224,.15), 0 0 26px rgba(79,179,255,.55);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .np-controls .big:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 6px rgba(47,143,224,.2), 0 0 34px rgba(79,179,255,.7);
   }
 
   .back-btn {
@@ -214,6 +248,37 @@
     -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%;
     background: var(--blue-glow); cursor: pointer;
   }
+
+  /* ---------- پنل مدیریت ---------- */
+  #adminOverlay {
+    display: none;
+    position: fixed; inset: 0; background: rgba(0,0,0,.6);
+    z-index: 50; align-items: center; justify-content: center;
+  }
+  #adminOverlay.active { display: flex; }
+  #adminPanel {
+    background: var(--navy); border: 1px solid var(--border);
+    border-radius: 16px; width: 92%; max-width: 480px; max-height: 82vh;
+    overflow-y: auto; padding: 20px;
+  }
+  #adminPanel h3 { margin: 0 0 14px; font-size: 15px; }
+  #adminPanel label { font-size: 12px; color: var(--muted); display: block; margin: 12px 0 5px; }
+  #adminPanel input[type="text"], #adminPanel input[type="password"], #adminPanel select {
+    width: 100%; background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 9px 12px; font-size: 13px;
+  }
+  #adminPanel .row-btns { display: flex; gap: 10px; margin-top: 16px; }
+  #adminPanel button.primary {
+    background: var(--blue); color: #fff; border: none; border-radius: 8px;
+    padding: 9px 16px; font-size: 13px; cursor: pointer; flex: 1;
+  }
+  #adminPanel button.secondary {
+    background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 16px; font-size: 13px; cursor: pointer;
+  }
+  .admin-song-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .admin-song-row input { flex: 1; }
+  #adminStatus { font-size: 12px; margin-top: 10px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -225,8 +290,9 @@
       <div class="logo-mark"></div>
       <div class="logo-text">P.I.F.E SONG</div>
     </div>
-    <div class="nav-item active" id="navHome">خانه</div>
+    <div class="nav-item active" id="navHome" onclick="goHome()">خانه</div>
     <div class="nav-item" onclick="document.getElementById('sideSearch').focus()">جستجو</div>
+    <div class="nav-item" onclick="openAdmin()">پنل مدیریت</div>
     <div class="sidebar-label">خواننده‌ها</div>
     <div id="sidebarSingers"></div>
   </aside>
@@ -295,6 +361,31 @@
   </div>
 </div>
 
+<div id="adminOverlay">
+  <div id="adminPanel">
+    <h3>پنل مدیریت — ویرایش اسم آهنگ‌ها برای همه</h3>
+
+    <label>توکن GitHub (فقط یک‌بار وارد کنید، ذخیره میشه)</label>
+    <input type="password" id="adminToken" placeholder="ghp_xxxxxxxxxxxx">
+
+    <label>خواننده</label>
+    <select id="adminSingerSelect"></select>
+
+    <div class="row-btns">
+      <button class="primary" onclick="adminLoadSongs()">بارگذاری آهنگ‌ها</button>
+      <button class="secondary" onclick="closeAdmin()">بستن</button>
+    </div>
+
+    <div id="adminSongsList" style="margin-top:16px;"></div>
+
+    <div class="row-btns" id="adminSaveRow" style="display:none;">
+      <button class="primary" onclick="adminSaveAll()">ذخیره برای همه</button>
+    </div>
+
+    <div id="adminStatus"></div>
+  </div>
+</div>
+
 <audio id="audio"></audio>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.7/jsmediatags.min.js"></script>
@@ -358,10 +449,15 @@ function cleanTitle(filename, singerSlug) {
 }
 function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
+function ghHeaders() {
+  const token = localStorage.getItem('gh_admin_token');
+  return token ? { Authorization: `token ${token}` } : {};
+}
+
 let _rootFilesPromise = null;
 function fetchRootFiles() {
   if (!_rootFilesPromise) {
-    _rootFilesPromise = fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/`)
+    _rootFilesPromise = fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/`, { headers: ghHeaders() })
       .then(r => r.ok ? r.json() : []).catch(() => []);
   }
   return _rootFilesPromise;
@@ -369,8 +465,10 @@ function fetchRootFiles() {
 
 async function fetchSongs(singer) {
   const results = [];
+  let rateLimited = false;
   try {
-    const res = await fetch(`${API_URL}/${singer.slug}`);
+    const res = await fetch(`${API_URL}/${singer.slug}`, { headers: ghHeaders() });
+    if (res.status === 403) rateLimited = true;
     if (res.ok) {
       const data = await res.json();
       data.filter(f => f.type === 'file' && f.name !== 'placeholder.txt')
@@ -383,11 +481,116 @@ async function fetchSongs(singer) {
     .filter(f => f.type === 'file' && /\.(mp3|m4a|wav|aac)$/i.test(f.name))
     .filter(f => normalize(f.name).startsWith(slugNorm))
     .forEach(f => results.push({ title: cleanTitle(f.name, singer.slug), file: f.download_url }));
+  results.rateLimited = rateLimited;
   return results;
 }
 
 function getTitleOverride(fileUrl) { try { return localStorage.getItem('title:' + fileUrl); } catch (e) { return null; } }
 function setTitleOverride(fileUrl, title) { try { localStorage.setItem('title:' + fileUrl, title); } catch (e) {} }
+
+/* ---------- سیستم تغییرات سراسری (برای همه) از طریق overrides.json ---------- */
+const OVERRIDES_PATH = 'overrides.json';
+let globalOverrides = null; // { fileUrl: title }
+let globalOverridesLoaded = false;
+
+async function loadGlobalOverrides() {
+  if (globalOverridesLoaded) return globalOverrides;
+  try {
+    const res = await fetch(`${RAW_BASE}/${OVERRIDES_PATH}?t=${Date.now()}`);
+    globalOverrides = res.ok ? await res.json() : {};
+  } catch (e) {
+    globalOverrides = {};
+  }
+  globalOverridesLoaded = true;
+  return globalOverrides;
+}
+
+function b64EncodeUnicode(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+}
+
+/* ---------- پنل مدیریت ---------- */
+function openAdmin() {
+  const select = document.getElementById('adminSingerSelect');
+  select.innerHTML = singers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('adminToken').value = localStorage.getItem('gh_admin_token') || '';
+  document.getElementById('adminOverlay').classList.add('active');
+}
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('active'); }
+
+let adminCurrentSongs = [];
+let adminCurrentSinger = null;
+
+async function adminLoadSongs() {
+  const token = document.getElementById('adminToken').value.trim();
+  if (token) localStorage.setItem('gh_admin_token', token);
+
+  const id = parseInt(document.getElementById('adminSingerSelect').value);
+  adminCurrentSinger = singers.find(s => s.id === id);
+  const status = document.getElementById('adminStatus');
+  status.textContent = 'در حال بارگذاری...';
+
+  await loadGlobalOverrides();
+  const songs = await fetchSongs(adminCurrentSinger);
+  songs.forEach(s => { if (globalOverrides[s.file]) s.title = globalOverrides[s.file]; });
+  adminCurrentSongs = songs;
+
+  const list = document.getElementById('adminSongsList');
+  list.innerHTML = '';
+  songs.forEach((song, i) => {
+    const row = document.createElement('div');
+    row.className = 'admin-song-row';
+    row.innerHTML = `<input type="text" data-file="${song.file}" value="${song.title.replace(/"/g, '&quot;')}">`;
+    list.appendChild(row);
+  });
+  document.getElementById('adminSaveRow').style.display = songs.length ? 'flex' : 'none';
+  status.textContent = songs.length ? `${songs.length} آهنگ بارگذاری شد.` : 'آهنگی پیدا نشد.';
+}
+
+async function adminSaveAll() {
+  const token = document.getElementById('adminToken').value.trim();
+  const status = document.getElementById('adminStatus');
+  if (!token) { status.textContent = 'اول توکن GitHub رو وارد کنید.'; return; }
+
+  status.textContent = 'در حال ذخیره...';
+  const inputs = document.querySelectorAll('#adminSongsList input');
+
+  try {
+    // گرفتن نسخه فعلی overrides.json (برای sha لازم برای آپدیت)
+    const getRes = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${OVERRIDES_PATH}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    let sha = undefined;
+    let current = {};
+    if (getRes.ok) {
+      const data = await getRes.json();
+      sha = data.sha;
+      current = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+    }
+
+    inputs.forEach(inp => { current[inp.dataset.file] = inp.value.trim(); });
+
+    const putRes = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${OVERRIDES_PATH}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'به‌روزرسانی اسم آهنگ‌ها از پنل مدیریت',
+        content: b64EncodeUnicode(JSON.stringify(current, null, 2)),
+        sha
+      })
+    });
+
+    if (putRes.ok) {
+      globalOverrides = current;
+      status.textContent = 'ذخیره شد! این تغییر برای همه اعمال میشه.';
+    } else {
+      const err = await putRes.json();
+      status.textContent = 'خطا: ' + (err.message || 'ذخیره نشد. توکن رو چک کنید.');
+    }
+  } catch (e) {
+    status.textContent = 'خطا در ارتباط با GitHub.';
+  }
+}
 
 const sidebarSingers = document.getElementById('sidebarSingers');
 function renderSidebar() {
@@ -427,6 +630,11 @@ function showBrowse() {
   document.getElementById('browseView').style.display = 'block';
   document.getElementById('songsView').style.display = 'none';
 }
+function goHome() {
+  document.getElementById('sideSearch').value = '';
+  renderGrid(singers);
+  showBrowse();
+}
 
 let currentSinger = null;
 let currentQueue = [];
@@ -442,14 +650,19 @@ async function openSinger(id) {
   list.innerHTML = `<div class="empty-note">در حال دریافت آهنگ‌های ${s.name}...</div>`;
 
   const songs = await fetchSongs(s);
+  await loadGlobalOverrides();
   songs.forEach(song => {
+    if (globalOverrides[song.file]) song.title = globalOverrides[song.file];
     const ov = getTitleOverride(song.file);
     if (ov) song.title = ov;
   });
   currentQueue = songs;
 
   if (songs.length === 0) {
-    list.innerHTML = `<div class="empty-note">هنوز آهنگی برای ${s.name} آپلود نشده.</div>`;
+    const hint = songs.rateLimited
+      ? `سایت به‌طور موقت زیاد به GitHub درخواست زده و محدود شده (Rate Limit). چند دقیقه صبر کنید، یا توکن رو از پنل مدیریت وارد کنید تا این محدودیت خیلی بالاتر بره.`
+      : `هنوز آهنگی برای ${s.name} آپلود نشده.`;
+    list.innerHTML = `<div class="empty-note">${hint}</div>`;
     return;
   }
   list.innerHTML = '';
@@ -531,6 +744,7 @@ function playAt(index) {
 
 function setArtwork(art, song, singer) {
   document.getElementById('npArt').style.backgroundImage = `url('${art}')`;
+  document.getElementById('nowPlaying').style.setProperty('--np-bg', `url('${art}')`);
   document.getElementById('npTitle').textContent = song.title;
   document.getElementById('npArtist').textContent = singer.name;
   document.getElementById('bpArt').style.backgroundImage = `url('${art}')`;
